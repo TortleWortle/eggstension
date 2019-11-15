@@ -1,0 +1,28 @@
+{
+  "name": "Eggh Together",
+  "version": "0.1",
+  "description": "Fibsh",
+  "browser_action": {
+    "default_title": "Hi",
+    "default_popup": "popup.html"
+  },
+  "permissions": [
+    "tabCapture",
+    "tabs",
+    "storage",
+    "<all_urls>"
+  ],
+  "background": {
+    "scripts": [
+      "background.js"
+    ],
+    "persistent": false
+  },
+  "icons": {
+    "32": "images/seal@0,12x.png",
+    "64": "images/seal@0,25x.png",
+    "128": "images/seal@0,5x.png",
+    "256": "images/seal.png"
+  },
+  "manifest_version": 2
+}

@@ -1,0 +1,24 @@
+{
+  "name": "extension",
+  "version": "1.0.0",
+  "description": "",
+  "main": "background.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack",
+    "dev": "webpack --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "socket.io-client": "^2.2.0",
+    "socket.io-p2p": "^2.2.0",
+    "webpack": "^4.41.2",
+    "webrtc-adapter": "^7.3.0"
+  },
+  "devDependencies": {
+    "copy-webpack-plugin": "^5.0.4",
+    "webpack-cli": "^3.3.6"
+  }
+}
