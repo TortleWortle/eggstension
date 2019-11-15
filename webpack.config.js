@@ -1,6 +1,6 @@
 const path = require('path');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-
+const Dotenv = require('dotenv-webpack');
 
 module.exports = {
   entry: {
@@ -14,5 +14,6 @@ module.exports = {
     new CopyWebpackPlugin([
       { from: 'static', to: path.resolve(__dirname, 'dist') }
     ]),
+    new Dotenv()
   ]
 };

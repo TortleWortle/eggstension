@@ -2,7 +2,8 @@ import adapter from 'webrtc-adapter';
 
 const configuration = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
 
-const host = "eggh.realmofthemadfibsh.com"
+const apiHost = process.env.API_HOST
+const wsHost = process.env.WS_HOST
 
 
 let ws;
@@ -75,10 +76,10 @@ function claimOwnerShip() {
 }
 
 async function startSocket() {
-  const info = await fetch(`http://${host}/newroom`).then(res => res.json())
+  const info = await fetch(`${apiHost}/newroom`).then(res => res.json())
   secret = info.secret;
 
-  ws = new WebSocket(`wss://${host}/rooms/${info.id}`)
+  ws = new WebSocket(`${wsHost}/rooms/${info.id}`)
 
   ws.onopen = function () {
     console.log("Connection opened")
@@ -97,7 +98,7 @@ async function startSocket() {
     }))
   }, 30000)
 
-  chrome.tabs.create({ url: `http://${host}/watch/${info.id}` });
+  chrome.tabs.create({ url: `${apiHost}/watch/${info.id}` });
 }
 
 
