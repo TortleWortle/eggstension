@@ -19,10 +19,10 @@
     "persistent": false
   },
   "icons": {
-    "32": "images/seal@0,12x.png",
-    "64": "images/seal@0,25x.png",
-    "128": "images/seal@0,5x.png",
-    "256": "images/seal.png"
+    "32": "images/icon@0,12x.png",
+    "64": "images/icon@0,25x.png",
+    "128": "images/icon@0,5x.png",
+    "256": "images/icon.png"
   },
   "manifest_version": 2
 }
