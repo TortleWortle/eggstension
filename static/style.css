@@ -1,0 +1,163 @@
+html {
+  font-size: 1rem;
+  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+body {
+  padding: 0;
+  margin: 0;
+  width: 20rem;
+  height: 17rem;
+  font-size: 14px;
+  background-color: #10192A;
+  position: relative;
+  overflow: hidden;
+}
+
+button {
+  outline: none;
+  border: none;
+  display: inline-block;
+  padding: .5em 2em;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: inherit;
+  background-color: #0089FF;
+  color: white;
+  margin: 0;
+  cursor: pointer;
+  transition: background-color 100ms;
+}
+
+button:hover {
+  background-color: #1B83DC;
+  border-color: #1B83DC;
+}
+
+button.green {
+  background-color: #3EBA80;
+}
+
+button.green:hover {
+  background-color: #32A16D;
+}
+
+button.red {
+  background-color: #EF4F4F;
+}
+
+button.red:hover {
+  background-color: #c03737;
+}
+
+.title {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.title h1 {
+  font-size: 1.8em;
+  color: white;
+  font-weight: bold;
+  margin-top: 0;
+  margin-bottom: .5rem;
+}
+
+.title p {
+  color: #9599B1;
+  font-size: 1em;
+  width: 12rem;
+  margin: 0 auto;
+}
+
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: auto;
+  height: 100%;
+  width: 100%;
+  position: relative;
+  z-index: 9;
+}
+
+.content {
+  text-align: center;
+}
+
+.deco1 {
+  background-color: #1C2840;
+  opacity: .35;
+  width: 20rem;
+  height: 20rem;
+  border-radius: 50%;
+  position: absolute;
+  bottom: -11rem;
+  left: -11rem;
+}
+
+.deco2 {
+  background-color: #1C2840;
+  opacity: .35;
+  width: 30rem;
+  height: 30rem;
+  border-radius: 50%;
+  position: absolute;
+  right: -23rem;
+  top: -11rem;
+}
+
+.deco3 {
+  background-color: #3190E3;
+  width: 9rem;
+  height: 9rem;
+  border-radius: 50%;
+  position: absolute;
+  top: -5rem;
+  left: -5rem;
+}
+
+body:not(.sharing) > .stream {
+  display: none;
+}
+
+body.sharing > .start {
+  display: none;
+}
+
+.linkgroup {
+  margin-bottom: 1rem;
+}
+
+.linkgroup .input {
+  border: 2px #283653 solid;
+  background-color: #10192A;
+  color: #586276;
+  outline: none;
+  padding: .5em .8em;
+  width: 11rem;
+  font-family: inherit;
+  font-size: inherit;
+  border-right: none;
+  border-radius: 4px 0 0 4px;
+}
+
+.linkgroup button {
+  border: 2px #0089FF solid;
+  border-radius: 0 4px 4px 0;
+  padding: .5em 0;
+  width: 6em;
+  text-align: center;
+  transition: border-color 100ms, background-color 100ms;
+}
+
+.linkgroup button:hover {
+  border-color: #1B83DC;
+}
+
+.hidden {
+  opacity: 0;
+}

@@ -1,85 +1,95 @@
 import adapter from 'webrtc-adapter';
+import { Actions, States, Operations } from './constants.js';
 
-const configuration = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
-
-const apiHost = process.env.API_HOST
-const wsHost = process.env.WS_HOST
-
+const configuration = {
+  iceServers: [
+    { urls: 'stun:stun.l.google.com:19302' }
+  ]
+};
+const apiHost = process.env.API_HOST;
+const wsHost = process.env.WS_HOST;
 
 let ws;
 let secret;
-let id;
 let rtc = {};
-let stream
-let timeout
+let stream;
+let timeout;
+let url;
+
+function sendWSMessage(obj) {
+  ws.send(JSON.stringify(obj));
+}
+
+function sendPopupMessage(port, obj) {
+  port.postMessage(JSON.stringify(obj));
+}
 
 function onmsg(evt) {
   const e = JSON.parse(evt.data);
 
   switch (e.op) {
-    case "IDENTIFY":
-      id = e.data.id
-      claimOwnerShip()
-      break
-    case "CREATE_OFFER":
-      createRtcConnection(e.data.recipient, JSON.parse(e.data.offer));
-      break
-    case "READY":
-      // rtc[e.data.recipient].addStream(stream)
+    case Operations.identify:
+      id = e.data.id;
+      claimOwnerShip();
       break;
-    case "ICE_CANDIDATE":
-      rtc[e.data.recipient] && rtc[e.data.recipient].addIceCandidate(JSON.parse(e.data.candidate))
-      break
+    case Operations.createOffer:
+      createRtcConnection(e.data.recipient, JSON.parse(e.data.offer));
+      break;
+    case Operations.ready:
+      break;
+    case Operations.iceCandidate:
+      rtc[e.data.recipient] && rtc[e.data.recipient].addIceCandidate(JSON.parse(e.data.candidate));
+      break;
   }
 
-  console.log(e)
+  console.log(e);
 }
 
 async function createRtcConnection(recipient, offer) {
-  const conn = new RTCPeerConnection(configuration)
-  stream.getTracks().forEach(track => conn.addTrack(track, stream))
-  conn.setRemoteDescription(offer)
-  const answer = await conn.createAnswer(offer)
-  conn.setLocalDescription(answer)
+  const conn = new RTCPeerConnection(configuration);
+  stream.getTracks().forEach(track => conn.addTrack(track, stream));
+  conn.setRemoteDescription(offer);
+
+  const answer = await conn.createAnswer(offer);
+  conn.setLocalDescription(answer);
 
   conn.addEventListener('icecandidate', function (event) {
-    console.log("Got ice candidate", JSON.parse(JSON.stringify(event.candidate)))
-    ws.send(JSON.stringify({
-      op: "ICE_CANDIDATE",
+    console.log("Got ice candidate", event.candidate);
+    sendMessage({
+      op: Operations.iceCandidate,
       candidate: JSON.stringify(event.candidate),
       recipient
-    }))
-  })
+    });
+  });
 
   conn.oniceconnectionstatechange = function () {
     if (conn.iceConnectionState == 'disconnected') {
-      rtc[recipient] = null
-      console.log("disconnected")
+      rtc[recipient] = null;
+      console.log("disconnected");
     }
   }
 
+  rtc[recipient] = conn;
 
-  rtc[recipient] = conn
-
-  ws.send(JSON.stringify({
-    op: "SEND_ANSWER",
+  sendWSMessage({
+    op: Operations.sendAnswer,
     recipient,
     answer: JSON.stringify(answer),
-  }))
+  });
 }
 
 function claimOwnerShip() {
-  ws.send(JSON.stringify({
-    op: "CLAIM_OWNERSHIP",
+  sendWSMessage({
+    op: Operations.claimOwnership,
     secret,
-  }))
+  });
 }
 
 async function startSocket() {
-  const info = await fetch(`${apiHost}/newroom`).then(res => res.json())
+  const info = await fetch(`${apiHost}/newroom`).then(res => res.json());
   secret = info.secret;
 
-  ws = new WebSocket(`${wsHost}/rooms/${info.id}`)
+  ws = new WebSocket(`${wsHost}/rooms/${info.id}`);
 
   ws.onopen = function () {
     console.log("Connection opened")
@@ -90,55 +100,68 @@ async function startSocket() {
   ws.onclose = function () {
     console.log("Connection closing")
   }
-  ws.onmessage = onmsg
+  ws.onmessage = onmsg;
 
   timeout = setInterval(() => {
-    ws.send(JSON.stringify({
-      op: "HEARTBEAT"
-    }))
-  }, 30000)
+    sendMessage({
+      op: Operations.heartBeat
+    });
+  }, 30000);
 
-  chrome.tabs.create({ url: `${apiHost}/watch/${info.id}` });
+  url = `${apiHost}/watch/${info.id}`;
+  chrome.tabs.create({ url });
 }
 
-
+function sendState(port) {
+  sendPopupMessage(port, {
+    action: Actions.setState,
+    state: stream != null ? States.sharing : States.idle,
+    url,
+  });
+}
 
 chrome.extension.onConnect.addListener(function (port) {
   console.log("Extension Connected .....");
   port.onMessage.addListener(function (msg) {
-    const payload = JSON.parse(msg)
+    const payload = JSON.parse(msg);
     console.log(payload);
 
     switch (payload.action) {
-      case 'START_SHARE':
-        if (stream) return
+      case Actions.startShare:
+        if (stream) return;
         chrome.tabCapture.capture({
           audio: true,
           video: true,
         }, lstream => {
-          stream = lstream
-          window.stream = stream
-          startSocket()
-        })
-        break
+          stream = lstream;
+          window.stream = stream;
+          sendState(port);
+          startSocket();
+        });
+        break;
 
-      case 'STOP_SHARE':
+      case Actions.getState:
+        sendState(port);
+      break;
+
+
+      case Actions.stopShare:
         if (Object.keys(rtc).length > 0) {
           Object.keys(rtc).forEach(key => {
             if (rtc[key]) rtc[key].close()
-          })
-          rtc = {}
+          });
+          rtc = {};
         }
         if (ws) {
-          ws.close()
-          ws = null
+          ws.close();
+          ws = null;
         }
         if (stream) {
-          stream.getTracks().forEach(track => track.stop())
-          stream = null
+          stream.getTracks().forEach(track => track.stop());
+          stream = null;
         }
-        clearTimeout(timeout)
-        break
+        clearTimeout(timeout);
+        break;
     }
   });
-})
+});
