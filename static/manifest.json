@@ -16,7 +16,7 @@
     "scripts": [
       "background.js"
     ],
-    "persistent": false
+    "persistent": true
   },
   "icons": {
     "32": "images/seal@0,12x.png",

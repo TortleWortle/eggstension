@@ -66,6 +66,11 @@ async function createRtcConnection(recipient, offer) {
       rtc[recipient] = null;
       console.log("disconnected");
     }
+    console.log("ICE state change: " + conn.iceConnectionState);
+  }
+
+  conn.onconnectionstatechange = function () {
+    console.log("state change: " + conn.connectionState);
   }
 
   rtc[recipient] = conn;
