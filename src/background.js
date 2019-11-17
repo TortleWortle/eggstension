@@ -29,7 +29,6 @@ function onmsg(evt) {
 
   switch (e.op) {
     case Operations.identify:
-      id = e.data.id;
       claimOwnerShip();
       break;
     case Operations.createOffer:
@@ -55,7 +54,7 @@ async function createRtcConnection(recipient, offer) {
 
   conn.addEventListener('icecandidate', function (event) {
     console.log("Got ice candidate", event.candidate);
-    sendMessage({
+    sendWSMessage({
       op: Operations.iceCandidate,
       candidate: JSON.stringify(event.candidate),
       recipient
@@ -103,7 +102,7 @@ async function startSocket() {
   ws.onmessage = onmsg;
 
   timeout = setInterval(() => {
-    sendMessage({
+    sendWSMessage({
       op: Operations.heartBeat
     });
   }, 30000);
