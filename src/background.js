@@ -14,7 +14,7 @@ let secret;
 let rtc = {};
 let stream;
 let timeout;
-let url;
+let url = "";
 
 function sendWSMessage(obj) {
   ws.send(JSON.stringify(obj));
@@ -113,7 +113,10 @@ async function startSocket() {
   }, 30000);
 
   url = `${apiHost}/watch/${info.id}`;
-  chrome.tabs.create({ url });
+  chrome.tabs.create({
+    url,
+    active: false
+  });
 }
 
 function sendState(port) {
@@ -136,11 +139,11 @@ chrome.extension.onConnect.addListener(function (port) {
         chrome.tabCapture.capture({
           audio: true,
           video: true,
-        }, lstream => {
+        }, async lstream => {
           stream = lstream;
           window.stream = stream;
+          await startSocket();
           sendState(port);
-          startSocket();
         });
         break;
 
