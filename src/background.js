@@ -7,7 +7,7 @@ const configuration = {
   ]
 };
 const apiHost = process.env.API_HOST;
-const wsHost = process.env.WS_HOST;
+const wsBase = process.env.WS_BASE;
 
 let ws;
 let secret;
@@ -90,10 +90,10 @@ function claimOwnerShip() {
 }
 
 async function startSocket() {
-  const info = await fetch(`${apiHost}/newroom`).then(res => res.json());
+  const info = await fetch(`${apiHost}/api/newroom`).then(res => res.json());
   secret = info.secret;
 
-  ws = new WebSocket(`${wsHost}/rooms/${info.id}`);
+  ws = new WebSocket(`${wsBase}/room/${info.id}/ws`);
 
   ws.onopen = function () {
     console.log("Connection opened")
@@ -149,7 +149,7 @@ chrome.extension.onConnect.addListener(function (port) {
 
       case Actions.getState:
         sendState(port);
-      break;
+        break;
 
 
       case Actions.stopShare:
